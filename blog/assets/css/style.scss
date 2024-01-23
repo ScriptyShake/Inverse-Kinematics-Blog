@@ -1,0 +1,76 @@
+---
+---
+
+$header-heading-color: #000;
+$header-bg-color: #ee7623;
+$header-bg-color-secondary: #ee7623;
+$section-headings-color: #000;
+$header-link-color: #ffffff;
+
+@import "{{ site.theme }}";
+
+.site-name {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 10px; // Optional: for some spacing
+  font-size: 20px; // Adjust as needed
+  z-index: 1000; // Ensures it's above other items
+}
+.site-name a {
+  text-decoration: none;
+  color: white;  
+}
+
+.btn {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: rgb(255, 255, 255);
+  background-color: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.2);
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 0.3rem;
+  transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+
+  &:hover {
+    color: rgb(255, 255, 255);
+    text-decoration: none;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-color: rgba(0, 0, 0, 0.3);
+  }
+
+  + .btn {
+    margin-left: 1rem;
+  }
+
+  @include large {
+    padding: 0.75rem 1rem;
+  }
+
+  @include medium {
+    padding: 0.6rem 0.9rem;
+    font-size: 0.9rem;
+  }
+
+  @include small {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+
+    + .btn {
+      margin-top: 1rem;
+      margin-left: 0;
+    }
+  }
+}
+
+.author {
+  color: $header-link-color;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
