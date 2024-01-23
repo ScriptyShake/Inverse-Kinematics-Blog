@@ -2,8 +2,7 @@ theme: jekyll-theme-cayman
 collections:
   ilos:
     output: true
-title: "⛰️ 2023-2024 Y2B PR - Learning Log"
+title: "Inverse Kinematics in C++ 101"
 description: Some description
 student:
-  name: Your Name
-  number: "00000"
+  name: by Valentina Malavasi

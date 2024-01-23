@@ -1,9 +1,9 @@
 ---
 layout: default
-title: "⛰️ 2023-2024 Y2B PR - Learning Log"
+title: "Inverse Kinematics in C++ 101"
 ---
 
-# ⛰️ 2023-2024 Y2B PR - Learning Log
+# Inverse Kinematics in C++ 101
 
 Student name: **YOUR NAME HERE**
 
