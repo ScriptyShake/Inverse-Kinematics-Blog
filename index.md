@@ -5,6 +5,16 @@ title: "Inverse Kinematics in C++ 101"
 
 ## Introduction
 
+## Table of Contents
+- [What is Inverse Kinematics?](#what-is-inverse-kinematics?)
+- [Prerequisites](#prerequisites)
+- [GLTF Skeletal Hierarchy Set-Up](#gltf-skeletal-hierarchy-set-up)
+- [Bones LookAt](#bones-lookat)
+- [CCD IK Algorithm](#ccd-ik-algorithm)
+- [FABRIK IK Algorithm](#fabrik-ik-algorithm)
+- [Moving Forward](#moving-forward)
+- [Conclusion](#conclusion)
+
 ## What is Inverse Kinematics?
 
 ## Prerequisites
@@ -33,6 +43,6 @@ title: "Inverse Kinematics in C++ 101"
 
 ### Implementation
 
-## Moving forward
+## Moving Forward
 
 ## Conclusion
