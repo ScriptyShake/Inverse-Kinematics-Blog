@@ -221,29 +221,49 @@ void CcdIk::CCDSolve(bee::Transform& target, int leg_index)
 
 ### Theory
 
-Explain pseudocode here...
+The FABRIK Algorithm (Forward And Backward Reaching Inverse Kinematics) is more complex than the CCD Algorithm but it also gives more natural movement for humanoids. It can also handle multiple targets. However, FABRIK works with positions instead of rotations, so we can implement it only using vectors. The FABRIK Algorithm also usually solves IK faster than CCD does, so in most cases implementing FABRIK is the more optimal choice.
+
+The FABRIK algorithm is divided into two parts:
+
+- Forward Reaching Phase: FABRIK iteratively adjusts the joint positions starting from the root of the IK Chain towards the end effector. Each joint's position is adjusted to be closer to the goal position, while making sure that the length of the 'bones' (segments between two joints) stay the same.
+
+- Backward Reaching Phase: Once the end effector is reached, FABRIK performs a backward pass through the IK Chain, and adjusts the positions of the joints from the end effector to the base. That way, the IK Chain is adjusted to better match the goal.
+
+Here is the FABRIK Algorithm in pseudocode:
+
+    void Iterate(const Transform& goal)
+    {
+        startPosition = chain[0]
+
+        // Iterate Backwards
+        chain[size - 1] = goal.position
+
+        for (i = size; i >= 0; --i)
+        {
+            current = chain[i]
+            next = chain[i + 1]
+            direction = normalize(current - next)
+            offset = direction * length[i + 1]
+            chain[i] = next + offset
+        }
+
+        // Iterate Forwards
+        chain[0] = startPosition
+        for (i = 1; i < size; ++i)
+        {
+            current = chain[i]
+            prev = chain[i - 1]
+            direction = normalize(current - prev)
+            offset = direction * length[i]
+            // TO CONTINUE WITH BOOK
+        }
+    }
 
 ### Implementation
 
 The FABRIK Algorithm is more complex and requires more functions to work.
 
-Combine:
-```cpp
-bee::Transform bee::FabrikIk::Combine(const Transform& a, const Transform& b)
-{
-    Transform out;
-
-    out.Scale = a.Scale * b.Scale;
-    out.Rotation = b.Rotation * a.Rotation;
-
-    out.Translation = a.Rotation * (a.Scale * b.Translation);
-    out.Translation = a.Translation + out.Translation;
-
-    return out;
-}
-```
-
-IKChainToWorld:
+IKChainToWorld: This function copies the IK Chain into the world transform vector and stores the bone lengths. The lengths std::vector stores the distance of a joint from its parent, which means that the root joint will always have a length of 0. For the other joints though, the distance at the i index is the distance between joints i and i - 1.
 ```cpp
 void bee::FabrikIk::IKChainToWorld(int leg_index)
 {
@@ -263,7 +283,7 @@ void bee::FabrikIk::IKChainToWorld(int leg_index)
 }
 ```
 
-IterateBackward:
+IterateBackward: The first phase.
 ```cpp
 void bee::FabrikIk::IterateBackward(const glm::vec3& goal, int leg_index)
 {
@@ -280,7 +300,7 @@ void bee::FabrikIk::IterateBackward(const glm::vec3& goal, int leg_index)
 }
 ```
 
-IterateForward:
+IterateForward: The second phase.
 ```cpp
 void bee::FabrikIk::IterateForward(const glm::vec3& base, int leg_index)
 {
@@ -297,7 +317,7 @@ void bee::FabrikIk::IterateForward(const glm::vec3& base, int leg_index)
 }
 ```
 
-WorldToIKChain:
+WorldToIKChain: Here we convert the world positions back into local space transforms. We loop through all the joints, then for each joint, find the world space transform of the current joint and the next one. Then store the world space position and rotation of the current joint.
 ```cpp
 void bee::FabrikIk::WorldToIKChain(int leg_index)
 {
@@ -320,7 +340,7 @@ void bee::FabrikIk::WorldToIKChain(int leg_index)
 }
 ```
 
-Now we put it all together in the Solver:
+Now we put it all together in the Solver following the pseudocode:
 
 ```cpp
 bool bee::FabrikIk::FABRIKSolve(const Transform& target, int leg_index)
