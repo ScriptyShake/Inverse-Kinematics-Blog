@@ -14,9 +14,9 @@ Now that we know what Inverse Kinematics actually is, let's get started!
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
-- [GLTF Skeletal Hierarchy Set-Up](#gltf-skeletal-hierarchy-set-up)
+- [GLTF Skeletal Hierarchy Set-Up & Forward Kinematics](#gltf-skeletal-hierarchy-set-up-and-forward-kinematics)
 - [Bones LookAt](#bones-lookat)
-- [CCD IK Algorithm](#ccd-ik-algorithm)
+- [Cyclic Coordinate Descent (CCD) IK Solver AlgorithmCCD IK Algorithm](#cyclic-coordinate-descent-ccd-ik-solver-algorithm)
 - [FABRIK IK Algorithm](#fabrik-ik-algorithm)
 - [Moving Forward](#moving-forward)
 - [Conclusion](#conclusion)
@@ -27,7 +27,7 @@ In this article I will assume that you already have a rigged model to use. You c
 
 In order for Inverse Kinematics to work, we will also need to set-up Forward Kinematics first, which I will explain shortly.
 
-## GLTF Skeletal Hierarchy Set-Up & Forward Kinematics
+## GLTF Skeletal Hierarchy Set-Up and Forward Kinematics
 
 ### Theory
 
@@ -147,7 +147,28 @@ void bee::SimpleIk::SimpleSolve(const Transform& target, int leg_index)
 
 ### Theory
 
-Explain pseudocode here...
+The Cyclic Coordinate Descent algorithm is one of the simplest and most widely used types of IK in Game Development. The algorithm can be used to pose a chain of joints so that the last joint in the chain (the end effector) comes as close to reaching the target as possible. However, it doesn't work well with multiple targets, for that the FABRIK Algorithm is more suited, which we will see later. The CCD Algorithm is also an iterative algorithm, so it will take multiple iterations in one frame for the end effector to reach the goal.
+
+Here are some important concepts to understand the CCD Algorithm:
+
+- The Goal: the target you want to reach.
+- IK Chain: the list that stores the joints you will apply the IK Solving on and rotate. For CCD, make sure you reverse your IK Chain first because we start with the joint before the end effector and finish at the base.
+- End Effector: the last joint in the IK Chain, if you are solving IK for a leg for example it would be the foot. This is the joint that needs to touch the goal.
+
+Here is how it would look like in pseudo-code:
+
+    //Loop through all joints in the chain in reverse, starting with the joint before the end effector
+    foreach joint in ikchain.reverse()
+    {
+        // Find a vector from current joint to end effector
+        jointToEffector = effector.position - joint.position
+
+        // Find a vector from the current joint to the goal
+        jointToGoal = goal.position - joint.position
+
+        // Rotate the joint so the joint to effector vector matches the orientation of the joint to goal vector
+        joint.rotation = fromToRotation(jointToEffector, jointToGoal) * joint.rotation
+    }
 
 ### Implementation
 
