@@ -4,7 +4,7 @@ title: "Inverse Kinematics in C++ 101"
 ---
 
 ## Introduction | What is Inverse Kinematics?
-Inverse Kinematics is a widely used algorithm used in Computer Graphics, Animation, Games and Robotics. For this project I will be focusing on Inverse Kinematics' usage in Computer Animation and Games but the theory is the same across disciplines. 
+Inverse Kinematics is a widely used algorithm used in Computer Graphics, Animation, Games and Robotics. For this project I will be focusing on Inverse Kinematics' usage in Computer Animation and Games but the theory is the same across disciplines. This project was created in the span of 6 weeks as a student work at Breda University of Applied Sciences.
 
 The purpose of Inverse Kinematics is to calculate joint rotations in a skeleton so that it can reach a target. Here is an example of Inverse Kinematics in Blender:
 
@@ -16,9 +16,9 @@ Now that we know what Inverse Kinematics actually is, let's get started!
 - [Prerequisites](#prerequisites)
 - [GLTF Skeletal Hierarchy Set-Up & Forward Kinematics](#gltf-skeletal-hierarchy-set-up-and-forward-kinematics)
 - [Bones LookAt](#bones-lookat)
-- [Cyclic Coordinate Descent (CCD) IK Solver AlgorithmCCD IK Algorithm](#cyclic-coordinate-descent-ccd-ik-solver-algorithm)
+- [Cyclic Coordinate Descent (CCD) IK Solver Algorithm](#cyclic-coordinate-descent-ccd-ik-solver-algorithm)
 - [FABRIK IK Algorithm](#fabrik-ik-algorithm)
-- [Moving Forward](#moving-forward)
+- [Building Upon this Project](#building-upon-this-project)
 - [Conclusion](#conclusion)
 
 ## Prerequisites
@@ -31,9 +31,9 @@ In order for Inverse Kinematics to work, we will also need to set-up Forward Kin
 
 ### Theory
 
-To do any kind of Inverse Kinematics, we first need a Skeletal Hierarchy to work with. Using GLTF, each bone in the model should be represented as a node. In GLTF, nodes follow a Node Hierarchy, such that there are parent and child nodes, similar to a Hierarchy Tree structure. Child nodes are linked to their parent nodes, and if a Transform component is attached to them, then the child will move along with the parent, however the parent will not follow if a child is moved. This is the basics of how Forward Kinematics work. In the custom engine I am suing, this has already been set-up for me, so I don't have to worry about parsing through the GLTF file myself, and I have a Tranform class which stores children and parent nodes.
+To do any kind of Inverse Kinematics, we first need a Skeletal Hierarchy to work with. Using GLTF, each joint in the model should be represented as a node. In GLTF, nodes follow a Node Hierarchy, such that there are parent and child nodes, similar to a Hierarchy Tree structure. Child nodes are linked to their parent nodes, and if a Transform component is attached to them, then the child will move along with the parent, however the parent will not follow if a child is moved. This is the basics of how Forward Kinematics work. In the custom engine I am using, this has already been set-up for me, so I don't have to worry about parsing through the GLTF file myself, and I have a Tranform class which stores children and parent nodes.
 
-In this project, I want to make the legs of a robotic creature move thanks to Inverse Kinematics, therefore I first need to create an IK Chain. An IK Chain is simply a list of joints of the leg or arm you want to solve IK on. For my robotic creature, I've made sure to have a consistent naming convention which means that I can find which joint has the name 'foot' in it, then I go back up the joint hierarchy until the desired hierarchy depth has been reached.
+In this project, I want to make the legs of a robotic creature move and rotate thanks to Inverse Kinematics, therefore I first need to create an IK Chain. An IK Chain is simply a list of joints you want to solve IK on, usually a leg or an arm. For my robotic creature, I've made sure to have a consistent naming convention which means that I can find which joint has the name 'foot' in it, then I go back up the joint hierarchy until the desired hierarchy depth has been reached, using a resursive function.
 
 ### Implementation
 
@@ -62,11 +62,13 @@ void SkeletonDebugDrawing(const entt::entity entity, const int depth = 0)
     }
 ```
 
+Here, I am using an ECS to get the entities and their attached components. With the way GLTF imported my model, I have nodes and meshes attached to them, which creates duplicates. I only want to use the nodes, so I make sure that entities with MeshRender components are not read. I then get the trasnforms of the valid entities and convert their Trasnlation to world space, before debug drawing them. I call the function inside itself so that it repeats this process while going down in the hierarchy.
+
 It should look something like this at the end:
 
 ![Alt text](image.png)
 
-I have a function called MakeLeg which creates the IK chain for a creature's leg.
+Next, I have a function called MakeLeg which creates the IK chain for a creature's leg.
 
 ```cpp
 int counter = 0;
@@ -102,16 +104,15 @@ int counter = 0;
         }
     }
 ```
+For this to work, you need to make sure to use a naming convention when rigging your model which uses 'foot' as its end effector name. The naming hierarchy of this model follow a pretty widely used Blender rigging convention:
 
-You can see that at the end, I reverse the leg chain. This is because algorithms such as CCD start from the end of the chain.
+![Alt text](image-1.png)
+
+In this code, once an end effector has been found, we define how long we want the IK Chain to be, and it will go up the hierarchy and retrieve the parent nodes, and store them in the IK Chain. You can see that at the end, I reverse the leg chain. This is because algorithms such as CCD start from the end of the chain. Once the IK Chain has been filled, I store it in another std::vector which stores all the IK Chains of the model.
 
 ## Bones LookAt
 
-### Theory
-
 Before getting started on Inverse Kinematics, we need to test if the Forward Kinematics are working properly and if the rotations are behaving correctly. I am using quaternions in this project for the rotations, so it is very important to make sure each step of the process is working correctly.
-
-### Implementation
 
 In this step, I make a function which calculates the Look At rotation of each joint towards the target.
 
@@ -143,6 +144,12 @@ void bee::SimpleIk::SimpleSolve(const Transform& target, int leg_index)
 }
 ```
 
+Here is the result:
+
+<video src="lookat%20ik%20demo.mp4" controls title="Title"></video>
+
+This algorithm is useful for head tracking and aiming animations.
+
 ## Cyclic Coordinate Descent (CCD) IK Solver Algorithm
 
 ### Theory
@@ -172,7 +179,7 @@ Here is how it would look like in pseudo-code:
 
 ### Implementation
 
-Here is my implementation of the CCD Algorithm in C++:
+Here is my implementation of the CCD Algorithm in C++ based on the pseudo-code:
 ```cpp
 void CcdIk::CCDSolve(bee::Transform& target, int leg_index)
 {
@@ -216,6 +223,12 @@ void CcdIk::CCDSolve(bee::Transform& target, int leg_index)
     }
 }
 ```
+
+Here is the result:
+
+<video src="ccd%20ik%20demo.mp4" controls title="Title"></video>
+
+Unfortunately, I didn't get this type of IK to run on the engine I am using due to quaternion math problems, but the overall algorithm logic is the same and should work in any engine.
 
 ## FABRIK IK Algorithm
 
@@ -378,12 +391,20 @@ bool bee::FabrikIk::FABRIKSolve(const Transform& target, int leg_index)
     return false;
 }
 ```
+The result:
 
+<video src="fabrik%20ik%20demo.mp4" controls title="Title"></video>
 
-## Moving Forward
+Again, I didn't get this type of IK to run on the engine I am using due to quaternion math problems, but the overall algorithm logic is the same and should work in any engine.
 
-To add on to this Inverse Kinematics project, I could add joint constraints so that there are no inuntural movements of the legs or arms. I could also add foot IK and make sure that it react to uneven terrain or stairs using ray-casting to place the target on the ground. I could also do a simple procdural walk cycle by moving the target with trigonometric functions and easing functions.
+## Building Upon this Project
+
+To add on to this Inverse Kinematics project, I could add joint constraints so that there are no unnatural movements of the legs or arms. I could also add foot IK and make sure that it reacts to uneven terrain or stairs using ray-casting to place the target on the ground. I could also do a simple procedural walk cycle by moving the target with trigonometric functions and easing functions.
 
 ## Conclusion
 
-...
+Here is a demo with the 3 types of IK: LookAt IK, CCD IK & FABRIK IK:
+
+<video src="ik%20demo.mp4" controls title="Title"></video>
+
+This project has taught me a lot about 3D Maths & Quaternion Rotations as well as World Space and Local Space conversions. While I wasn't able to make the IK work in my current engine, I have been able to do a lot of research on Inverse Kinematics and Skeletal Hierarchy Structures. It was a great learning excerise and taught me a lot about research and planning, and while this current implementation of IK in the custom engine doesn't properly solve IK, the overall theory and principles should apply regardlesss of what engine is being used.
