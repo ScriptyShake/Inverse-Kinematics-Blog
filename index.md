@@ -3,8 +3,12 @@ layout: default
 title: "Inverse Kinematics in C++ 101"
 ---
 
+This project was created in the span of 6 weeks as a student work for my 2nd Year studying Game Programming at Breda University of Applied Sciences.
+
+![Alt text](<Logo BUas_RGB.png>)
+
 ## Introduction | What is Inverse Kinematics?
-Inverse Kinematics is a widely used algorithm used in Computer Graphics, Animation, Games and Robotics. For this project I will be focusing on Inverse Kinematics' usage in Computer Animation and Games but the theory is the same across disciplines. This project was created in the span of 6 weeks as a student work at Breda University of Applied Sciences.
+Inverse Kinematics is a widely used algorithm used in Computer Graphics, Animation, Games and Robotics. For this project I will be focusing on Inverse Kinematics' usage in Computer Animation and Games but the theory is the same across disciplines.
 
 The purpose of Inverse Kinematics is to calculate joint rotations in a skeleton so that it can reach a target. Here is an example of Inverse Kinematics in Blender:
 
