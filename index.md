@@ -162,7 +162,7 @@ Here are some important concepts to understand the CCD Algorithm:
 - IK Chain: the list that stores the joints you will apply the IK Solving on and rotate. For CCD, make sure you reverse your IK Chain first because we start with the joint before the end effector and finish at the base.
 - End Effector: the last joint in the IK Chain, if you are solving IK for a leg for example it would be the foot. This is the joint that needs to touch the goal.
 
-Here is how it would look like in pseudo-code:
+Here is how it would look like in pseudo-code (From "Hand-on C++ Game Animation Programming"):
 
     //Loop through all joints in the chain in reverse, starting with the joint before the end effector
     foreach joint in ikchain.reverse()
@@ -242,7 +242,7 @@ The FABRIK algorithm is divided into two parts:
 
 - Backward Reaching Phase: Once the end effector is reached, FABRIK performs a backward pass through the IK Chain, and adjusts the positions of the joints from the end effector to the base. That way, the IK Chain is adjusted to better match the goal.
 
-Here is the FABRIK Algorithm in pseudocode:
+Here is the FABRIK Algorithm in pseudocode (From "Hand-on C++ Game Animation Programming"):
 
     void Iterate(const Transform& goal)
     {
@@ -268,7 +268,7 @@ Here is the FABRIK Algorithm in pseudocode:
             prev = chain[i - 1]
             direction = normalize(current - prev)
             offset = direction * length[i]
-            // TO CONTINUE WITH BOOK
+            chain[i] = prev + offset
         }
     }
 
