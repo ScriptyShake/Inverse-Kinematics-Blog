@@ -181,6 +181,9 @@ Here is how it would look like in pseudo-code (From "Hand-on C++ Game Animation 
         joint.rotation = fromToRotation(jointToEffector, jointToGoal) * joint.rotation
     }
 
+Here is the visual explanation of the CCD Algorithm:
+![alt text](<CCD IK Visual Explanations.png>)
+
 ### Implementation
 
 Here is my implementation of the CCD Algorithm in C++ based on the pseudo-code:
@@ -275,6 +278,9 @@ Here is the FABRIK Algorithm in pseudocode (From "Hand-on C++ Game Animation Pro
             chain[i] = prev + offset
         }
     }
+
+Here is the visual explanation of the CCD Algorithm:
+![alt text](<FABRIK IK Visual Explanations.png>)
 
 ### Implementation
 
